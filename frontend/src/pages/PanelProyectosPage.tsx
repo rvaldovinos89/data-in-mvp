@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
+import { removeToken } from '../services/auth';
 
   type Proyecto = {
    id: number;
@@ -20,6 +21,11 @@ function PanelProyectosPage() {
   const proyectosPorPagina = 10;
 
   const navigate = useNavigate();
+  
+  const handleLogout = () => {
+  removeToken();
+  navigate('/login');
+};
   
   const getProgressColor = (porcentaje: number) => {
   if (porcentaje > 100) return '#dc2626';
@@ -107,7 +113,15 @@ function PanelProyectosPage() {
   return (
     <div style={pageStyle}>
       <div style={cardStyle}>
+        
+	  <div style={headerStyle}>
         <h1 style={titleStyle}>Tus proyectos</h1>
+
+      <button style={logoutButtonStyle} onClick={handleLogout}>
+        Cerrar sesión
+      </button>
+    </div>
+		
 
         <button
           style={createButtonStyle}
@@ -220,7 +234,7 @@ const cardStyle: React.CSSProperties = {
 
 const titleStyle: React.CSSProperties = {
   fontSize: '28px',
-  marginBottom: '20px',
+  marginBottom: 0,
   color: '#111827',
 };
 
@@ -334,6 +348,23 @@ const paginationTextStyle: React.CSSProperties = {
   fontSize: '14px',
   fontWeight: 600,
   color: '#374151',
+};
+
+const headerStyle: React.CSSProperties = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginBottom: '24px',
+};
+
+const logoutButtonStyle: React.CSSProperties = {
+  background: '#fee2e2',
+  color: '#991b1b',
+  border: '1px solid #fecaca',
+  borderRadius: '12px',
+  padding: '10px 14px',
+  fontWeight: 700,
+  cursor: 'pointer',
 };
 
 export default PanelProyectosPage;
