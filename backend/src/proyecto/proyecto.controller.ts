@@ -32,29 +32,56 @@ export class ProyectoController {
     });
   }
   
+  @UseGuards(JwtAuthGuard)
   @Get()
-  async listarProyectos() {
-    return this.proyectoService.listarProyectos();
-  }
-  
-  @UseGuards(JwtAuthGuard)
-  @Patch(':id')
-  async actualizarProyecto(
-    @Param('id') id: string,
-    @Body() body: UpdateProyectoDto,
-  ) {
-    return this.proyectoService.actualizarProyecto(Number(id), body);
-  }
-  
-  @UseGuards(JwtAuthGuard)
-  @Get(':id/resumen')
-  obtenerResumen(@Param('id') id: string) {
-    return this.proyectoService.obtenerResumenProyecto(Number(id));
-  }
-  
-  @Get(':id/margen')
-  obtenerMargen(@Param('id') id: string) {
-    return this.proyectoService.obtenerMargen(Number(id));
-  }
+  async listarProyectos(@Request() req) {
+    const empresaId = req.user.empresaId;
+
+    return this.proyectoService.listarProyectos(empresaId);
+}
+
+@UseGuards(JwtAuthGuard)
+@Patch(':id')
+async actualizarProyecto(
+  @Param('id') id: string,
+  @Body() body: UpdateProyectoDto,
+  @Request() req,
+) {
+  const empresaId = req.user.empresaId;
+
+  return this.proyectoService.actualizarProyecto(
+    Number(id),
+    empresaId,
+    body,
+  );
+}
+
+@UseGuards(JwtAuthGuard)
+@Get(':id/resumen')
+obtenerResumen(
+  @Param('id') id: string,
+  @Request() req,
+) {
+  const empresaId = req.user.empresaId;
+
+  return this.proyectoService.obtenerResumenProyecto(
+    Number(id),
+    empresaId,
+  );
+}
+
+@UseGuards(JwtAuthGuard)
+@Get(':id/margen')
+obtenerMargen(
+  @Param('id') id: string,
+  @Request() req,
+) {
+  const empresaId = req.user.empresaId;
+
+  return this.proyectoService.obtenerMargen(
+    Number(id),
+    empresaId,
+  );
+}
 
 }

@@ -7,6 +7,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { ProyectoModule } from './proyecto/proyecto.module';
 import { CompraModule } from './compra/compra.module';
+import { EmpresaModule } from './empresa/empresa.module';
 
 
 
@@ -20,6 +21,7 @@ import { CompraModule } from './compra/compra.module';
     AuthModule,
     ProyectoModule,
 	CompraModule,
+	EmpresaModule,
   ],
   controllers: [AppController],
   providers: [AppService],

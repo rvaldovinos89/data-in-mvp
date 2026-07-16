@@ -16,7 +16,7 @@ export class AuthController {
   
   @Post('register')
   register(@Body() body: RegisterDto) {
-  return this.authService.register(body.nombre, body.email, body.password);
+  return this.authService.register(body.nombre, body.email, body.password, body.empresaId);
   }
 
   @UseGuards(JwtAuthGuard)

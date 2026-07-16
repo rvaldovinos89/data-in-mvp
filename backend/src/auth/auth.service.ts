@@ -42,7 +42,13 @@ export class AuthService {
     };
   }
 
-  async register(nombre: string, email: string, password: string) {
+  async register(
+		nombre: string, 
+		email: string, 
+		password: string, 
+		empresaId: number,
+		){
+			
     const existingUser = await this.prisma.usuario.findUnique({
       where: { email },
     });
@@ -53,6 +59,17 @@ export class AuthService {
         HttpStatus.BAD_REQUEST,
       );
     }
+	
+	const empresa = await this.prisma.empresa.findUnique({
+		where: { id: empresaId },
+	});
+
+	if (!empresa) {
+	  throw new HttpException(
+		'La empresa seleccionada no existe',
+         HttpStatus.NOT_FOUND,
+	 );
+	}
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -61,7 +78,7 @@ export class AuthService {
         nombre,
         email,
         password: hashedPassword,
-        empresaId: 1,
+        empresaId,
       },
     });
 

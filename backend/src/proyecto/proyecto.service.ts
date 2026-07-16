@@ -13,19 +13,27 @@ export class ProyectoService {
 
   constructor(private prisma: PrismaService) {}
 
-   private async buscarProyectoPorId(id: number) {
-    const proyecto = await this.prisma.proyecto.findUnique({
-      where: { id },
-    });
+   private async buscarProyectoPorId(
+     id: number,
+     empresaId: number,
+   ) {
+     const proyecto = await this.prisma.proyecto.findFirst({
+       where: {
+         id,
+         empresaId,
+    },
+  });
 
-    if (!proyecto) {
-      throw new NotFoundException('Proyecto no encontrado');
-    }
-
-    return proyecto;
+  if (!proyecto) {
+    throw new NotFoundException('Proyecto no encontrado');
   }
-  
-  private async calcularCostoTotal(proyectoId: number): Promise<number> {
+
+  return proyecto;
+}
+
+   private async calcularCostoTotal(
+     proyectoId: number,
+   ): Promise<number> {
     const resultado = await this.prisma.compra.aggregate({
       where: { proyectoId },
       _sum: {
@@ -67,11 +75,16 @@ export class ProyectoService {
 
   }
 
-  async listarProyectos() {
-
+  async listarProyectos(empresaId: number) {
     try {
-
-      return await this.prisma.proyecto.findMany();
+      return await this.prisma.proyecto.findMany({
+        where: {
+          empresaId,
+        },
+        orderBy: {
+          id: 'desc',
+        },
+      });
 
     } catch (error) {
 
@@ -85,15 +98,19 @@ export class ProyectoService {
   }
   
    async actualizarProyecto(
-    proyectoId: number,
-    data: {
-      nombre?: string;
-      presupuesto?: number;
-      precioVenta?: number;
-    },
-  ) {
+     proyectoId: number,
+     empresaId: number,
+     data: {
+       nombre?: string;
+       presupuesto?: number;
+       precioVenta?: number;
+     },
+   ) {
     try {
-      const proyecto = await this.buscarProyectoPorId(proyectoId);
+      const proyecto = await this.buscarProyectoPorId(
+        proyectoId,
+        empresaId,
+      );
 
       if (proyecto.estado?.toLowerCase() === 'cerrado') {
         throw new ConflictException(
@@ -124,9 +141,15 @@ export class ProyectoService {
     }
   }
   
-  async obtenerMargen(proyectoId: number) {
+  async obtenerMargen(
+    proyectoId: number,
+    empresaId: number,
+  ) {
     try {
-      const proyecto = await this.buscarProyectoPorId(proyectoId);
+      const proyecto = await this.buscarProyectoPorId(
+		proyectoId,
+		empresaId,
+	  );
       const costoTotal = await this.calcularCostoTotal(proyectoId);
       const precioVenta = proyecto.precioVenta || 0;
 
@@ -152,9 +175,15 @@ export class ProyectoService {
 
    
    
-   async obtenerResumenProyecto(proyectoId: number) {
+   async obtenerResumenProyecto(
+	proyectoId: number,
+	empresaId: number,
+	) {
     try {
-      const proyecto = await this.buscarProyectoPorId(proyectoId);
+      const proyecto = await this.buscarProyectoPorId(
+		proyectoId,
+		empresaId,
+      );
 
       const costoTotal = await this.calcularCostoTotal(proyectoId);
       const presupuesto = proyecto.presupuesto ?? 0;

@@ -12,7 +12,14 @@ import { removeToken } from '../services/auth';
    estadoFinanciero?: string;
 };
 
+  type Empresa = {
+   id: number;
+   nombre: string;
+   rut: string;
+};
+
 function PanelProyectosPage() {
+  const [empresa, setEmpresa] = useState<Empresa | null>(null);
   const [proyectos, setProyectos] = useState<Proyecto[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -88,6 +95,8 @@ function PanelProyectosPage() {
   }
 }
 
+   
+
     cargarProyectos();
   }, []);
 
@@ -104,7 +113,19 @@ function PanelProyectosPage() {
         const totalPaginas = Math.ceil(
         proyectos.length / proyectosPorPagina,
         );
+   useEffect(() => {
+     async function cargarEmpresa() {
+      try {
+        const response = await api.get('/empresas/mi-empresa');
 
+        setEmpresa(response.data.data);
+      } catch (error) {
+        console.error('Error al cargar la empresa:', error);
+      }
+    }
+
+    cargarEmpresa();
+ }, []);
 
   if (loading) {
     return <p>Cargando proyectos...</p>;
@@ -115,12 +136,20 @@ function PanelProyectosPage() {
       <div style={cardStyle}>
         
 	  <div style={headerStyle}>
-        <h1 style={titleStyle}>Tus proyectos</h1>
+        <div>
+          <p style={companyLabelStyle}>Empresa activa</p>
 
-      <button style={logoutButtonStyle} onClick={handleLogout}>
-        Cerrar sesión
-      </button>
-    </div>
+          <p style={companyNameStyle}>
+            🏢 {empresa?.nombre ?? 'Cargando empresa...'}
+          </p>
+
+          <h1 style={titleStyle}>Tus proyectos</h1>
+        </div>
+
+        <button style={logoutButtonStyle} onClick={handleLogout}>
+          Cerrar sesión
+        </button>
+        </div>
 		
 
         <button
@@ -365,6 +394,20 @@ const logoutButtonStyle: React.CSSProperties = {
   padding: '10px 14px',
   fontWeight: 700,
   cursor: 'pointer',
+};
+
+const companyLabelStyle: React.CSSProperties = {
+  margin: 0,
+  fontSize: '13px',
+  color: '#6b7280',
+  fontWeight: 600,
+};
+
+const companyNameStyle: React.CSSProperties = {
+  margin: '4px 0 8px',
+  fontSize: '18px',
+  color: '#2563eb',
+  fontWeight: 700,
 };
 
 export default PanelProyectosPage;
